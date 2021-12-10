@@ -83,18 +83,19 @@ func parseDirectionsFromFile(filename string) (instructions []Instruction, err e
 }
 
 func Navigate(instructions []Instruction) (position Position) {
+	var aim uint
 	for _, instruction := range instructions {
 		switch instruction.direction {
 		case Up:
-			position = Position{position.horizontal, position.depth - instruction.amount}
+			aim -= instruction.amount
 			break
 
 		case Down:
-			position = Position{position.horizontal, position.depth + instruction.amount}
+			aim += instruction.amount
 			break
 
 		case Forward:
-			position = Position{position.horizontal + instruction.amount, position.depth}
+			position = Position{position.horizontal + instruction.amount, position.depth + (aim * instruction.amount)}
 			break
 		}
 	}

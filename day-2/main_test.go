@@ -14,7 +14,7 @@ func TestNavigate(t *testing.T) {
 		args args
 		want Position
 	}{
-		{"Correctly navigates", args{instructions: []Instruction{{Forward, 5}, {Down, 5}, {Forward, 8}, {Up, 3}, {Down, 8}, {Forward, 2}}}, Position{15, 10}},
+		{"Correctly navigates", args{instructions: []Instruction{{Forward, 5}, {Down, 5}, {Forward, 8}, {Up, 3}, {Down, 8}, {Forward, 2}}}, Position{15, 60}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
