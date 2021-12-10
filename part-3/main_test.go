@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-var testInput = [][5]bool{
+var testInput = [][]bool{
 	{false, false, true, false, false},
 	{true, true, true, true, false},
 	{true, false, true, true, false},
@@ -19,7 +19,7 @@ var testInput = [][5]bool{
 
 func TestCalculateGammaRate(t *testing.T) {
 	type args struct {
-		input [][ReadingLength]bool
+		input [][]bool
 	}
 	tests := []struct {
 		name       string
@@ -39,7 +39,7 @@ func TestCalculateGammaRate(t *testing.T) {
 
 func TestCalculateEpsilonRate(t *testing.T) {
 	type args struct {
-		input [][ReadingLength]bool
+		input [][]bool
 	}
 	tests := []struct {
 		name       string

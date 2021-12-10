@@ -1,24 +1,66 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"log"
+	"math"
+	"os"
+	"strings"
+)
 
-const ReadingLength = 5
+const AsciiOne = 49
 
 func main() {
+	readings, err := parseReadingsFromFile("input.txt")
 
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	gamma := CalculateGammaRate(readings)
+	epsilon := CalculateEpsilonRate(readings)
+
+	fmt.Printf("gamma rate: %d\nepsilon rate: %d\n", gamma, epsilon)
+	fmt.Printf("Total power consumption is: %d\n", gamma*epsilon)
 }
 
-func CalculateGammaRate(input [][ReadingLength]bool) uint {
+func parseReadingsFromFile(filename string) (output [][]bool, err error) {
+	data, err := os.ReadFile(filename)
+
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(data), "\n")
+
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+
+		var reading []bool
+		//output := append(output, []bool{})
+		for _, char := range line {
+			//output := append(output, []bool{})
+			reading = append(reading, char == AsciiOne)
+		}
+		output = append(output, reading)
+	}
+
+	return output, nil
+}
+
+func CalculateGammaRate(input [][]bool) uint {
 	return binaryBoolSliceToUint(getMajorityBits(input))
 }
 
-func CalculateEpsilonRate(input [][ReadingLength]bool) uint {
+func CalculateEpsilonRate(input [][]bool) uint {
 	return binaryBoolSliceToUint(invertBinarySlice(getMajorityBits(input)))
 }
 
-func getMajorityBits(readings [][ReadingLength]bool) (output [ReadingLength]bool) {
+func getMajorityBits(readings [][]bool) (output []bool) {
 
-	for i := 0; i < ReadingLength; i++ {
+	for i := 0; i < len(readings[0]); i++ {
 		var trueCount uint
 
 		for _, reading := range readings {
@@ -28,13 +70,13 @@ func getMajorityBits(readings [][ReadingLength]bool) (output [ReadingLength]bool
 			}
 		}
 
-		output[i] = trueCount > uint(len(readings)/2)
+		output = append(output, trueCount > uint(len(readings)/2))
 	}
 
 	return output
 }
 
-func binaryBoolSliceToUint(slice [ReadingLength]bool) (output uint) {
+func binaryBoolSliceToUint(slice []bool) (output uint) {
 	for i, bit := range slice {
 		exponent := len(slice) - 1 - i
 		if bit {
@@ -45,9 +87,9 @@ func binaryBoolSliceToUint(slice [ReadingLength]bool) (output uint) {
 	return output
 }
 
-func invertBinarySlice(input [ReadingLength]bool) (output [ReadingLength]bool) {
-	for i, value := range input {
-		output[i] = !value
+func invertBinarySlice(input []bool) (output []bool) {
+	for _, value := range input {
+		output = append(output, !value)
 	}
 
 	return output
