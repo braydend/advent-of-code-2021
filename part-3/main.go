@@ -1,38 +1,130 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"log"
+	"math"
+	"os"
+	"strings"
+)
+
+const AsciiOne = 49
 
 func main() {
+	readings, err := parseReadingsFromFile("input.txt")
 
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	gamma := CalculateGammaRate(readings)
+	epsilon := CalculateEpsilonRate(readings)
+
+	fmt.Printf("gamma rate: %d\nepsilon rate: %d\n", gamma, epsilon)
+	fmt.Printf("Total power consumption is: %d\n", gamma*epsilon)
 }
 
-func CalculateGammaRate(input [][5]bool) (result uint) {
-	var bits [5]bool
+func parseReadingsFromFile(filename string) (output [][]bool, err error) {
+	data, err := os.ReadFile(filename)
 
-	for i := 0; i < 4; i++ {
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(data), "\n")
+
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+
+		var reading []bool
+		//output := append(output, []bool{})
+		for _, char := range line {
+			//output := append(output, []bool{})
+			reading = append(reading, char == AsciiOne)
+		}
+		output = append(output, reading)
+	}
+
+	return output, nil
+}
+
+func CalculateGammaRate(input [][]bool) uint {
+	return binaryBoolSliceToUint(getMajorityBits(input))
+}
+
+func CalculateEpsilonRate(input [][]bool) uint {
+	return binaryBoolSliceToUint(invertBinarySlice(getMajorityBits(input)))
+}
+
+func CalculateOxygenGeneratorRating(input [][]bool) uint {
+	relevantReadings := input
+
+	for i := 0; i < len(relevantReadings[0]); i++ {
+		majorityBits := getMajorityBits(relevantReadings)
+		var indiciesToKeep []int
+		if len(relevantReadings) == 1 {
+			return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
+		}
+
+		for j, reading := range relevantReadings {
+			if reading[i] == majorityBits[i] {
+				indiciesToKeep = append(indiciesToKeep, j)
+			}
+		}
+
+		var correctReadings [][]bool
+		for _, index := range indiciesToKeep {
+			correctReadings = append(correctReadings, relevantReadings[index])
+		}
+
+		relevantReadings = correctReadings
+	}
+
+	return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
+}
+
+func getMajorityBits(readings [][]bool) (output []bool) {
+
+	for i := 0; i < len(readings[0]); i++ {
 		var trueCount uint
-		var falseCount uint
 
-		for _, reading := range input {
+		for _, reading := range readings {
 			if reading[i] {
 				trueCount++
 				continue
 			}
-			falseCount++
 		}
 
-		if trueCount > falseCount {
-			bits[i] = true
+		halfCountUint := uint(math.Ceil(float64(len(readings)) / float64(2)))
+
+		if trueCount == halfCountUint {
+			output = append(output, true)
 			continue
 		}
-		bits[i] = false
+
+		output = append(output, trueCount > uint(len(readings)/2))
 	}
 
-	for i, bit := range bits {
+	return output
+}
+
+func binaryBoolSliceToUint(slice []bool) (output uint) {
+	for i, bit := range slice {
+		exponent := len(slice) - 1 - i
 		if bit {
-			result += uint(math.Pow(2, float64(len(bits)-1-i)))
+			output += uint(math.Pow(2, float64(exponent)))
 		}
 	}
 
-	return result
+	return output
+}
+
+func invertBinarySlice(input []bool) (output []bool) {
+	for _, value := range input {
+		output = append(output, !value)
+	}
+
+	return output
 }
