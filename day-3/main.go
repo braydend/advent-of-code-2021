@@ -39,9 +39,8 @@ func parseReadingsFromFile(filename string) (output [][]bool, err error) {
 		}
 
 		var reading []bool
-		//output := append(output, []bool{})
+
 		for _, char := range line {
-			//output := append(output, []bool{})
 			reading = append(reading, char == AsciiOne)
 		}
 		output = append(output, reading)
@@ -63,18 +62,11 @@ func CalculateOxygenGeneratorRating(input [][]bool) uint {
 
 	for i := 0; i < len(relevantReadings[0]); i++ {
 		majorityBits := getMajorityBits(relevantReadings)
-		var readingsToKeep [][]bool
 		if isLastReading := len(relevantReadings) == 1; isLastReading {
 			return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
 		}
 
-		for _, reading := range relevantReadings {
-			if reading[i] == majorityBits[i] {
-				readingsToKeep = append(readingsToKeep, reading)
-			}
-		}
-
-		relevantReadings = readingsToKeep
+		relevantReadings = getReadingsThatMatchBitAtPosition(relevantReadings, majorityBits[i], i)
 	}
 
 	return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
@@ -85,21 +77,24 @@ func CalculateCo2ScrubberRating(input [][]bool) uint {
 
 	for i := 0; i < len(relevantReadings[0]); i++ {
 		minorityBits := invertBinarySlice(getMajorityBits(relevantReadings))
-		var readingsToKeep [][]bool
 		if isLastReading := len(relevantReadings) == 1; isLastReading {
 			return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
 		}
 
-		for _, reading := range relevantReadings {
-			if reading[i] == minorityBits[i] {
-				readingsToKeep = append(readingsToKeep, reading)
-			}
-		}
-
-		relevantReadings = readingsToKeep
+		relevantReadings = getReadingsThatMatchBitAtPosition(relevantReadings, minorityBits[i], i)
 	}
 
 	return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
+}
+
+func getReadingsThatMatchBitAtPosition(input [][]bool, bit bool, position int) (output [][]bool) {
+	for _, reading := range input {
+		if reading[position] == bit {
+			output = append(output, reading)
+		}
+	}
+
+	return output
 }
 
 func getMajorityBits(readings [][]bool) (output []bool) {
