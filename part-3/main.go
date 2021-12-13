@@ -80,6 +80,28 @@ func CalculateOxygenGeneratorRating(input [][]bool) uint {
 	return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
 }
 
+func CalculateCo2ScrubberRating(input [][]bool) uint {
+	relevantReadings := input
+
+	for i := 0; i < len(relevantReadings[0]); i++ {
+		minorityBits := invertBinarySlice(getMajorityBits(relevantReadings))
+		var readingsToKeep [][]bool
+		if isLastReading := len(relevantReadings) == 1; isLastReading {
+			return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
+		}
+
+		for _, reading := range relevantReadings {
+			if reading[i] == minorityBits[i] {
+				readingsToKeep = append(readingsToKeep, reading)
+			}
+		}
+
+		relevantReadings = readingsToKeep
+	}
+
+	return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
+}
+
 func getMajorityBits(readings [][]bool) (output []bool) {
 
 	for i := 0; i < len(readings[0]); i++ {
