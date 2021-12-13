@@ -63,23 +63,18 @@ func CalculateOxygenGeneratorRating(input [][]bool) uint {
 
 	for i := 0; i < len(relevantReadings[0]); i++ {
 		majorityBits := getMajorityBits(relevantReadings)
-		var indiciesToKeep []int
-		if len(relevantReadings) == 1 {
+		var readingsToKeep [][]bool
+		if isLastReading := len(relevantReadings) == 1; isLastReading {
 			return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
 		}
 
-		for j, reading := range relevantReadings {
+		for _, reading := range relevantReadings {
 			if reading[i] == majorityBits[i] {
-				indiciesToKeep = append(indiciesToKeep, j)
+				readingsToKeep = append(readingsToKeep, reading)
 			}
 		}
 
-		var correctReadings [][]bool
-		for _, index := range indiciesToKeep {
-			correctReadings = append(correctReadings, relevantReadings[index])
-		}
-
-		relevantReadings = correctReadings
+		relevantReadings = readingsToKeep
 	}
 
 	return binaryBoolSliceToUint(getMajorityBits(relevantReadings))
@@ -97,9 +92,9 @@ func getMajorityBits(readings [][]bool) (output []bool) {
 			}
 		}
 
-		halfCountUint := uint(math.Ceil(float64(len(readings)) / float64(2)))
+		halfLength := uint(math.Ceil(float64(len(readings)) / float64(2)))
 
-		if trueCount == halfCountUint {
+		if trueCount == halfLength {
 			output = append(output, true)
 			continue
 		}
