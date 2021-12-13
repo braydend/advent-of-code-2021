@@ -19,9 +19,13 @@ func main() {
 
 	gamma := CalculateGammaRate(readings)
 	epsilon := CalculateEpsilonRate(readings)
+	oxygen := CalculateOxygenGeneratorRating(readings)
+	co2 := CalculateCo2ScrubberRating(readings)
 
 	fmt.Printf("gamma rate: %d\nepsilon rate: %d\n", gamma, epsilon)
 	fmt.Printf("Total power consumption is: %d\n", gamma*epsilon)
+	fmt.Printf("Oxygen generation rating: %d\nCO2 scrubber rating: %d\n", oxygen, co2)
+	fmt.Printf("Life support rating: %d\n", oxygen*co2)
 }
 
 func parseReadingsFromFile(filename string) (output [][]bool, err error) {
