@@ -1,35 +1,51 @@
 package main
 
+import (
+	"fmt"
+	"github.com/braydend/advent-of-code/day-4/bingo"
+	"github.com/braydend/advent-of-code/day-4/io"
+	"log"
+	"os"
+)
+
 func main() {
+	game, err := parseFile("input.txt")
 
-}
-
-type Bingo [][]int
-
-func CheckBoard(board Bingo, numbers []int) (isComplete bool) {
-	for i, row := range board {
-		if checkArray(row, numbers) {
-			return true
-		}
-		var column []int
-		for j := 0; j < len(row); j++ {
-			column = append(column, board[j][i])
-		}
-		return checkArray(column, numbers)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return false
-}
 
-func checkArray(input []int, numbers []int) bool {
-	var foundCount int
-
-	for _, i := range input {
-		for _, n := range numbers {
-			if i == n {
-				foundCount++
-			}
+	for i, board := range game.boards {
+		if bingo.CheckBoard(board, game.numbers) {
+			fmt.Printf("Player %d is the winner!", i+1)
+			return
 		}
 	}
 
-	return foundCount == len(input)
+	fmt.Printf("Everyone loses!\n")
+}
+
+func parseFile(filename string) (output struct {
+	numbers []int
+	boards  []bingo.Bingo
+}, err error) {
+	data, err := os.ReadFile(filename)
+
+	if err != nil {
+		return output, err
+	}
+
+	output.boards, err = io.ParseBoards(data)
+
+	if err != nil {
+		return output, err
+	}
+
+	output.numbers, err = io.ParseNumbers(data)
+
+	if err != nil {
+		return output, err
+	}
+
+	return output, nil
 }
