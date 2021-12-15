@@ -1,6 +1,35 @@
 package bingo
 
+import "reflect"
+
 type Bingo [][]int
+
+func FindLastWinningBoard(boards []Bingo, numbers []int) (board Bingo, calledNumbers []int) {
+	remainingBoards := boards
+
+	for i, number := range numbers {
+		calledNumbers = append(calledNumbers, number)
+		board, _, _ := FindWinningBoard(remainingBoards, numbers[:i])
+
+		remainingBoards = removeBoardFromSlice(board, remainingBoards)
+
+		if isLastBoard := len(remainingBoards) == 1; isLastBoard {
+			return remainingBoards[0], calledNumbers
+		}
+	}
+
+	return board, calledNumbers
+}
+
+func removeBoardFromSlice(board Bingo, boards []Bingo) []Bingo {
+	for i, bingo := range boards {
+		if reflect.DeepEqual(bingo, board) {
+			return append(boards[:i], boards[i+1:]...)
+		}
+	}
+
+	return boards
+}
 
 func FindWinningBoard(boards []Bingo, numbers []int) (winner Bingo, playerNumber int, numbersCalled []int) {
 	var calledNumbers []int
