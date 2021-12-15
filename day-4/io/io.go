@@ -41,7 +41,7 @@ func ParseBoards(input []byte) (boards []bingo.Bingo, err error) {
 	}
 
 	var rows [][]int
-	for i := 0; i < len(linesWithNumbers); i++ {
+	for i := 0; i < 5; i++ {
 		rows = append(rows, []int{})
 	}
 	board := rows
@@ -49,12 +49,10 @@ func ParseBoards(input []byte) (boards []bingo.Bingo, err error) {
 	for i, line := range linesWithNumbers {
 		if i > 1 && i%5 == 0 {
 			var rows [][]int
-			//boards = append(boards, board)
-			for i := 0; i < len(linesWithNumbers); i++ {
+			for i := 0; i < 5; i++ {
 				rows = append(rows, []int{})
 			}
 			board = rows
-			continue
 		}
 
 		var numberList []int
