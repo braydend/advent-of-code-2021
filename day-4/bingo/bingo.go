@@ -33,19 +33,13 @@ func checkArray(input []int, numbers []int) bool {
 func CalculateScore(board Bingo, numbers []int) (score int) {
 	var valuesToCount []int
 
-	for _, row := range board {
-		for _, cell := range row {
-			isValue := false
-			for _, number := range numbers {
-				if number == cell {
-					isValue = true
-				}
-			}
-			if !isValue {
-				valuesToCount = append(valuesToCount, cell)
-			}
+	checkValue := func(cell int) {
+		if !doesValueExistInSlice(cell, numbers) {
+			valuesToCount = append(valuesToCount, cell)
 		}
 	}
+
+	board.forEachCell(checkValue)
 
 	for _, value := range valuesToCount {
 		score += value
@@ -54,4 +48,21 @@ func CalculateScore(board Bingo, numbers []int) (score int) {
 	score *= numbers[len(numbers)-1]
 
 	return score
+}
+
+func (board Bingo) forEachCell(fn func(cell int)) {
+	for _, row := range board {
+		for _, cell := range row {
+			fn(cell)
+		}
+	}
+}
+
+func doesValueExistInSlice(value int, slice []int) bool {
+	for _, item := range slice {
+		if item == value {
+			return true
+		}
+	}
+	return false
 }
