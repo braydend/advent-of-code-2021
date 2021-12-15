@@ -29,3 +29,29 @@ func checkArray(input []int, numbers []int) bool {
 
 	return foundCount == len(input)
 }
+
+func CalculateScore(board Bingo, numbers []int) (score int) {
+	var valuesToCount []int
+
+	for _, row := range board {
+		for _, cell := range row {
+			isValue := false
+			for _, number := range numbers {
+				if number == cell {
+					isValue = true
+				}
+			}
+			if !isValue {
+				valuesToCount = append(valuesToCount, cell)
+			}
+		}
+	}
+
+	for _, value := range valuesToCount {
+		score += value
+	}
+
+	score *= numbers[len(numbers)-1]
+
+	return score
+}

@@ -6,9 +6,10 @@ import (
 )
 
 var (
-	testBoard   = bingo.Bingo{{1, 2, 3, 4, 5}, {6, 7, 8, 9, 0}, {10, 11, 12, 13, 14}, {15, 16, 17, 18, 19}, {20, 21, 22, 23, 24}}
-	completeRow = []int{1, 2, 3, 4, 5}
-	completeCol = []int{1, 6, 10, 15, 20}
+	testBoard    = bingo.Bingo{{14, 21, 17, 24, 4}, {10, 16, 15, 9, 19}, {18, 8, 23, 26, 20}, {22, 11, 13, 6, 5}, {2, 0, 12, 3, 7}}
+	completeRow  = []int{14, 21, 17, 24, 4}
+	completeCol  = []int{14, 10, 18, 22, 2}
+	drawnNumbers = []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24}
 )
 
 func TestCheckBoard(t *testing.T) {
@@ -29,6 +30,27 @@ func TestCheckBoard(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotIsComplete := bingo.CheckBoard(tt.args.board, tt.args.numbers); gotIsComplete != tt.wantIsComplete {
 				t.Errorf("CheckBoard() = %v, want %v", gotIsComplete, tt.wantIsComplete)
+			}
+		})
+	}
+}
+
+func TestCalculateScore(t *testing.T) {
+	type args struct {
+		board   bingo.Bingo
+		numbers []int
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantScore int
+	}{
+		{"Correctly calculates score", args{testBoard, drawnNumbers}, 4512},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotScore := bingo.CalculateScore(tt.args.board, tt.args.numbers); gotScore != tt.wantScore {
+				t.Errorf("CalculateScore() = %v, want %v", gotScore, tt.wantScore)
 			}
 		})
 	}
