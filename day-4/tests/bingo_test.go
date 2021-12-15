@@ -12,7 +12,7 @@ var (
 	testBoardThree = bingo.Bingo{{14, 21, 17, 24, 4}, {10, 16, 15, 9, 19}, {18, 8, 23, 26, 20}, {22, 11, 13, 6, 5}, {2, 0, 12, 3, 7}}
 	completeRow    = []int{14, 21, 17, 24, 4}
 	completeCol    = []int{14, 10, 18, 22, 2}
-	drawnNumbers   = []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13}
+	drawnNumbers   = []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19, 3, 26, 1}
 )
 
 func TestCheckBoard(t *testing.T) {
@@ -48,7 +48,7 @@ func TestCalculateScore(t *testing.T) {
 		args      args
 		wantScore int
 	}{
-		{"Correctly calculates score", args{testBoardThree, drawnNumbers}, 4512},
+		{"Correctly calculates score", args{testBoardThree, []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24}}, 4512},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -80,6 +80,32 @@ func TestFindWinningBoard(t *testing.T) {
 			}
 			if gotPlayerNumber != tt.wantPlayerNumber {
 				t.Errorf("FindWinningBoard() gotPlayerNumber = %v, want %v", gotPlayerNumber, tt.wantPlayerNumber)
+			}
+			if !reflect.DeepEqual(gotNumbersCalled, tt.wantNumbersCalled) {
+				t.Errorf("FindWinningBoard() gotNumbersCalled = %v, want %v", gotNumbersCalled, tt.wantNumbersCalled)
+			}
+		})
+	}
+}
+
+func TestFindLastWinningBoard(t *testing.T) {
+	type args struct {
+		boards  []bingo.Bingo
+		numbers []int
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantBoard         bingo.Bingo
+		wantNumbersCalled []int
+	}{
+		{"Correctly find the last winning board", args{[]bingo.Bingo{testBoardOne, testBoardTwo, testBoardThree}, drawnNumbers}, testBoardTwo, []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotBoard, gotNumbersCalled := bingo.FindLastWinningBoard(tt.args.boards, tt.args.numbers)
+			if !reflect.DeepEqual(gotBoard, tt.wantBoard) {
+				t.Errorf("FindLastWinningBoard() = %v, want %v", gotBoard, tt.wantBoard)
 			}
 			if !reflect.DeepEqual(gotNumbersCalled, tt.wantNumbersCalled) {
 				t.Errorf("FindWinningBoard() gotNumbersCalled = %v, want %v", gotNumbersCalled, tt.wantNumbersCalled)
