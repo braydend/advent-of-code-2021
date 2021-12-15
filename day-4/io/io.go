@@ -7,31 +7,47 @@ import (
 )
 
 const (
-	NumbersLineNumber     = 0
-	BoardsLineStartNumber = 2
+	numbersLineNumber     = 0
+	boardsLineStartNumber = 2
+	bingoSize             = 5
 )
 
 func ParseNumbers(input []byte) (numbers []int, err error) {
 	lineSplits := strings.Split(string(input), "\n")
+	numberLine := lineSplits[numbersLineNumber]
 
-	numberLine := lineSplits[NumbersLineNumber]
+	return parseNumbersFromLine(numberLine, ",")
+}
 
-	for _, number := range strings.Split(numberLine, ",") {
-		n, err := strconv.Atoi(number)
+func ParseBoards(input []byte) (boards []bingo.Bingo, err error) {
+	linesWithNumbers, err := parseRowsOfNumbersFromInput(string(input))
 
+	if err != nil {
+		return nil, err
+	}
+
+	board := newBingo()
+
+	for i, line := range linesWithNumbers {
+		numberList, err := parseNumbersFromLine(line, " ")
 		if err != nil {
 			return nil, err
 		}
 
-		numbers = append(numbers, n)
+		board[i%5] = numberList
+
+		if (i+1)%bingoSize == 0 {
+			boards = append(boards, board)
+			board = newBingo()
+		}
 	}
 
-	return numbers, nil
+	return boards, nil
 }
 
-func ParseBoards(input []byte) (boards []bingo.Bingo, err error) {
-	lineSplits := strings.Split(string(input), "\n")
-	lineSplits = lineSplits[BoardsLineStartNumber:]
+func parseRowsOfNumbersFromInput(input string) ([]string, error) {
+	lineSplits := strings.Split(input, "\n")
+	lineSplits = lineSplits[boardsLineStartNumber:]
 	var linesWithNumbers []string
 
 	for _, split := range lineSplits {
@@ -40,47 +56,29 @@ func ParseBoards(input []byte) (boards []bingo.Bingo, err error) {
 		}
 	}
 
-	var rows [][]int
-	for i := 0; i < 5; i++ {
-		rows = append(rows, []int{})
-	}
-	board := rows
+	return linesWithNumbers, nil
+}
 
-	for i, line := range linesWithNumbers {
-		if i > 1 && i%5 == 0 {
-			var rows [][]int
-			for i := 0; i < 5; i++ {
-				rows = append(rows, []int{})
-			}
-			board = rows
+func parseNumbersFromLine(line string, delimiter string) ([]int, error) {
+	var numberList []int
+	numbers := strings.Split(line, delimiter)
+
+	for _, number := range numbers {
+		if number == "" {
+			continue
 		}
-
-		var numberList []int
-		numbers := strings.Split(line, " ")
-
-		for _, number := range numbers {
-			if number == "" {
-				continue
-			}
-			value, err := strconv.Atoi(number)
-
-			if err != nil {
-				return nil, err
-			}
-
-			numberList = append(numberList, value)
-		}
-
-		board[i%5] = numberList
+		value, err := strconv.Atoi(number)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if (i+1)%5 == 0 {
-			boards = append(boards, board)
-		}
+		numberList = append(numberList, value)
 	}
 
-	return boards, nil
+	return numberList, nil
+}
+
+func newBingo() bingo.Bingo {
+	return bingo.Bingo{[]int{}, []int{}, []int{}, []int{}, []int{}}
 }
