@@ -2,6 +2,21 @@ package bingo
 
 type Bingo [][]int
 
+func FindWinningBoard(boards []Bingo, numbers []int) (winner Bingo, playerNumber int, numbersCalled []int) {
+	var calledNumbers []int
+
+	for _, number := range numbers {
+		calledNumbers = append(calledNumbers, number)
+		for j, board := range boards {
+			if CheckBoard(board, calledNumbers) {
+				return board, j + 1, calledNumbers
+			}
+		}
+	}
+
+	return nil, 0, nil
+}
+
 func CheckBoard(board Bingo, numbers []int) (isComplete bool) {
 	for i, row := range board {
 		if checkArray(row, numbers) {
