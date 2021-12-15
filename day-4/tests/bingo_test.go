@@ -2,14 +2,17 @@ package tests
 
 import (
 	"github.com/braydend/advent-of-code/day-4/bingo"
+	"reflect"
 	"testing"
 )
 
 var (
-	testBoard    = bingo.Bingo{{14, 21, 17, 24, 4}, {10, 16, 15, 9, 19}, {18, 8, 23, 26, 20}, {22, 11, 13, 6, 5}, {2, 0, 12, 3, 7}}
-	completeRow  = []int{14, 21, 17, 24, 4}
-	completeCol  = []int{14, 10, 18, 22, 2}
-	drawnNumbers = []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24}
+	testBoardOne   = bingo.Bingo{{22, 13, 17, 11, 0}, {8, 2, 23, 4, 24}, {21, 9, 14, 16, 7}, {6, 10, 3, 18, 5}, {1, 12, 20, 15, 19}}
+	testBoardTwo   = bingo.Bingo{{3, 15, 0, 2, 22}, {9, 18, 13, 17, 5}, {19, 8, 7, 25, 23}, {20, 11, 10, 24, 4}, {14, 21, 16, 12, 6}}
+	testBoardThree = bingo.Bingo{{14, 21, 17, 24, 4}, {10, 16, 15, 9, 19}, {18, 8, 23, 26, 20}, {22, 11, 13, 6, 5}, {2, 0, 12, 3, 7}}
+	completeRow    = []int{14, 21, 17, 24, 4}
+	completeCol    = []int{14, 10, 18, 22, 2}
+	drawnNumbers   = []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13}
 )
 
 func TestCheckBoard(t *testing.T) {
@@ -22,9 +25,9 @@ func TestCheckBoard(t *testing.T) {
 		args           args
 		wantIsComplete bool
 	}{
-		{"Board is not complete", args{testBoard, []int{1, 7, 3, 24, 5}}, false},
-		{"Board has complete row", args{testBoard, completeRow}, true},
-		{"Board has complete col", args{testBoard, completeCol}, true},
+		{"Board is not complete", args{testBoardThree, []int{1, 7, 3, 24, 5}}, false},
+		{"Board has complete row", args{testBoardThree, completeRow}, true},
+		{"Board has complete col", args{testBoardThree, completeCol}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,12 +48,41 @@ func TestCalculateScore(t *testing.T) {
 		args      args
 		wantScore int
 	}{
-		{"Correctly calculates score", args{testBoard, drawnNumbers}, 4512},
+		{"Correctly calculates score", args{testBoardThree, drawnNumbers}, 4512},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotScore := bingo.CalculateScore(tt.args.board, tt.args.numbers); gotScore != tt.wantScore {
 				t.Errorf("CalculateScore() = %v, want %v", gotScore, tt.wantScore)
+			}
+		})
+	}
+}
+
+func TestFindWinningBoard(t *testing.T) {
+	type args struct {
+		boards  []bingo.Bingo
+		numbers []int
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantWinner        bingo.Bingo
+		wantPlayerNumber  int
+		wantNumbersCalled []int
+	}{
+		{"Correctly finds the winning board", args{[]bingo.Bingo{testBoardOne, testBoardTwo, testBoardThree}, drawnNumbers}, testBoardThree, 3, []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24}}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotWinner, gotPlayerNumber, gotNumbersCalled := bingo.FindWinningBoard(tt.args.boards, tt.args.numbers)
+			if !reflect.DeepEqual(gotWinner, tt.wantWinner) {
+				t.Errorf("FindWinningBoard() gotWinner = %v, want %v", gotWinner, tt.wantWinner)
+			}
+			if gotPlayerNumber != tt.wantPlayerNumber {
+				t.Errorf("FindWinningBoard() gotPlayerNumber = %v, want %v", gotPlayerNumber, tt.wantPlayerNumber)
+			}
+			if !reflect.DeepEqual(gotNumbersCalled, tt.wantNumbersCalled) {
+				t.Errorf("FindWinningBoard() gotNumbersCalled = %v, want %v", gotNumbersCalled, tt.wantNumbersCalled)
 			}
 		})
 	}
