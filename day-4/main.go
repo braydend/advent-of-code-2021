@@ -15,10 +15,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for i, board := range game.boards {
-		if bingo.CheckBoard(board, game.numbers) {
-			fmt.Printf("Player %d is the winner!", i+1)
-			return
+	numbersToCall := game.numbers
+	var calledNumbers []int
+
+	for _, number := range numbersToCall {
+		calledNumbers = append(calledNumbers, number)
+		for j, board := range game.boards {
+			if bingo.CheckBoard(board, calledNumbers) {
+				fmt.Printf("Player %d is the winner!\nTheir final score is: %d", j+1, bingo.CalculateScore(board, calledNumbers))
+				return
+			}
 		}
 	}
 
