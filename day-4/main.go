@@ -15,9 +15,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	winner, playerNumber, calledNumbers := bingo.FindWinningBoard(game.boards, game.numbers)
+	winners, playerNumbers, calledNumbers := bingo.FindWinningBoards(game.boards, game.numbers)
 
-	fmt.Printf("Player %d is the winner!\nTheir final score is: %d", playerNumber, bingo.CalculateScore(winner, calledNumbers))
+	if len(winners) > 0 {
+		for i, winner := range winners {
+			fmt.Printf("Player %d is the winner!\nTheir final score is: %d\n", playerNumbers[i], bingo.CalculateScore(winner, calledNumbers))
+		}
+
+		lastWinner, calledNumbers := bingo.FindLastWinningBoard(game.boards, game.numbers)
+
+		fmt.Printf("The last winner's final score is: %d \n", bingo.CalculateScore(lastWinner, calledNumbers))
+	}
 
 	fmt.Printf("Everyone loses!\n")
 }
