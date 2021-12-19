@@ -9,9 +9,13 @@ func FindLastWinningBoard(boards []Bingo, numbers []int) (board Bingo, calledNum
 
 	for i, number := range numbers {
 		calledNumbers = append(calledNumbers, number)
-		board, _, _ := FindWinningBoard(remainingBoards, numbers[:i])
+		boards, _, _ := FindWinningBoards(remainingBoards, numbers[:i])
 
-		remainingBoards = removeBoardFromSlice(board, remainingBoards)
+		if len(boards) > 0 {
+			for _, bingo := range boards {
+				remainingBoards = removeBoardFromSlice(bingo, remainingBoards)
+			}
+		}
 
 		if isLastBoard := len(remainingBoards) == 1; isLastBoard {
 			return remainingBoards[0], calledNumbers
@@ -31,47 +35,50 @@ func removeBoardFromSlice(board Bingo, boards []Bingo) []Bingo {
 	return boards
 }
 
-func FindWinningBoard(boards []Bingo, numbers []int) (winner Bingo, playerNumber int, numbersCalled []int) {
-	var calledNumbers []int
-
+func FindWinningBoards(boards []Bingo, numbers []int) (winners []Bingo, playerNumbers []int, calledNumbers []int) {
 	for _, number := range numbers {
 		calledNumbers = append(calledNumbers, number)
 		for j, board := range boards {
 			if CheckBoard(board, calledNumbers) {
-				return board, j + 1, calledNumbers
+				winners = append(winners, board)
+				playerNumbers = append(playerNumbers, j+1)
 			}
+		}
+
+		if len(winners) > 0 {
+			return winners, playerNumbers, calledNumbers
 		}
 	}
 
-	return nil, 0, nil
+	return winners, playerNumbers, calledNumbers
 }
 
-func CheckBoard(board Bingo, numbers []int) (isComplete bool) {
+func CheckBoard(board Bingo, calledNumbers []int) (isComplete bool) {
 	for i, row := range board {
-		if checkArray(row, numbers) {
+		if checkArray(row, calledNumbers) {
 			return true
 		}
 		var column []int
 		for j := 0; j < len(row); j++ {
 			column = append(column, board[j][i])
 		}
-		return checkArray(column, numbers)
+		if checkArray(column, calledNumbers) {
+			return true
+		}
 	}
 	return false
 }
 
-func checkArray(input []int, numbers []int) bool {
+func checkArray(bingoSlice []int, calledNumbers []int) bool {
 	var foundCount int
 
-	for _, i := range input {
-		for _, n := range numbers {
-			if i == n {
-				foundCount++
-			}
+	for _, calledNumber := range calledNumbers {
+		if doesValueExistInSlice(calledNumber, bingoSlice) {
+			foundCount++
 		}
 	}
 
-	return foundCount == len(input)
+	return foundCount == len(bingoSlice)
 }
 
 func CalculateScore(board Bingo, numbers []int) (score int) {

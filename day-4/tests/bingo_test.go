@@ -10,8 +10,8 @@ var (
 	testBoardOne   = bingo.Bingo{{22, 13, 17, 11, 0}, {8, 2, 23, 4, 24}, {21, 9, 14, 16, 7}, {6, 10, 3, 18, 5}, {1, 12, 20, 15, 19}}
 	testBoardTwo   = bingo.Bingo{{3, 15, 0, 2, 22}, {9, 18, 13, 17, 5}, {19, 8, 7, 25, 23}, {20, 11, 10, 24, 4}, {14, 21, 16, 12, 6}}
 	testBoardThree = bingo.Bingo{{14, 21, 17, 24, 4}, {10, 16, 15, 9, 19}, {18, 8, 23, 26, 20}, {22, 11, 13, 6, 5}, {2, 0, 12, 3, 7}}
-	completeRow    = []int{14, 21, 17, 24, 4}
-	completeCol    = []int{14, 10, 18, 22, 2}
+	completeRow    = []int{18, 8, 23, 26, 20}
+	completeCol    = []int{17, 15, 23, 13, 12}
 	drawnNumbers   = []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19, 3, 26, 1}
 )
 
@@ -59,7 +59,7 @@ func TestCalculateScore(t *testing.T) {
 	}
 }
 
-func TestFindWinningBoard(t *testing.T) {
+func TestFindWinningBoards(t *testing.T) {
 	type args struct {
 		boards  []bingo.Bingo
 		numbers []int
@@ -67,22 +67,23 @@ func TestFindWinningBoard(t *testing.T) {
 	tests := []struct {
 		name              string
 		args              args
-		wantWinner        bingo.Bingo
-		wantPlayerNumber  int
+		wantWinners       []bingo.Bingo
+		wantPlayerNumbers []int
 		wantNumbersCalled []int
 	}{
-		{"Correctly finds the winning board", args{[]bingo.Bingo{testBoardOne, testBoardTwo, testBoardThree}, drawnNumbers}, testBoardThree, 3, []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24}}}
+		{"Correctly finds the winning board", args{[]bingo.Bingo{testBoardOne, testBoardTwo, testBoardThree}, drawnNumbers}, []bingo.Bingo{testBoardThree}, []int{3}, []int{7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24}},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotWinner, gotPlayerNumber, gotNumbersCalled := bingo.FindWinningBoard(tt.args.boards, tt.args.numbers)
-			if !reflect.DeepEqual(gotWinner, tt.wantWinner) {
-				t.Errorf("FindWinningBoard() gotWinner = %v, want %v", gotWinner, tt.wantWinner)
+			gotWinners, gotPlayerNumbers, gotNumbersCalled := bingo.FindWinningBoards(tt.args.boards, tt.args.numbers)
+			if !reflect.DeepEqual(gotWinners, tt.wantWinners) {
+				t.Errorf("FindWinningBoards() gotWinners = %v, want %v", gotWinners, tt.wantWinners)
 			}
-			if gotPlayerNumber != tt.wantPlayerNumber {
-				t.Errorf("FindWinningBoard() gotPlayerNumber = %v, want %v", gotPlayerNumber, tt.wantPlayerNumber)
+			if !reflect.DeepEqual(gotPlayerNumbers, tt.wantPlayerNumbers) {
+				t.Errorf("FindWinningBoards() gotPlayerNumbers = %v, want %v", gotPlayerNumbers, tt.wantPlayerNumbers)
 			}
 			if !reflect.DeepEqual(gotNumbersCalled, tt.wantNumbersCalled) {
-				t.Errorf("FindWinningBoard() gotNumbersCalled = %v, want %v", gotNumbersCalled, tt.wantNumbersCalled)
+				t.Errorf("FindWinningBoards() gotNumbersCalled = %v, want %v", gotNumbersCalled, tt.wantNumbersCalled)
 			}
 		})
 	}
