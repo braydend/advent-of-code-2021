@@ -1,20 +1,20 @@
 package vent
 
 type Vent struct {
-	startingPosition position
-	endingPosition   position
+	startingPosition coordinates
+	endingPosition   coordinates
 }
 
-type position struct {
+type coordinates struct {
 	x int
 	y int
 }
 
 func NewVent(x1, y1, x2, y2 int) Vent {
-	return Vent{position{x1, y1}, position{x2, y2}}
+	return Vent{coordinates{x1, y1}, coordinates{x2, y2}}
 }
 
-func (v Vent) findHighestXAndY() (highest position) {
+func (v Vent) findHighestXAndY() (highest coordinates) {
 	if v.startingPosition.x >= v.endingPosition.x {
 		highest.x = v.startingPosition.x
 	} else {
@@ -30,7 +30,7 @@ func (v Vent) findHighestXAndY() (highest position) {
 	return highest
 }
 
-func (v Vent) findLowestXAndY() (lowest position) {
+func (v Vent) findLowestXAndY() (lowest coordinates) {
 	if v.startingPosition.x >= v.endingPosition.x {
 		lowest.x = v.endingPosition.x
 	} else {
@@ -46,17 +46,17 @@ func (v Vent) findLowestXAndY() (lowest position) {
 	return lowest
 }
 
-func (v Vent) GetCoveredCoordinates() (coveredPositions []position) {
+func (v Vent) GetCoveredCoordinates() (coveredCoordinates []coordinates) {
 	highest := v.findHighestXAndY()
 	lowest := v.findLowestXAndY()
 
 	for x := lowest.x; x <= highest.x; x++ {
 		for y := lowest.y; y <= highest.y; y++ {
-			coveredPositions = append(coveredPositions, position{x, y})
+			coveredCoordinates = append(coveredCoordinates, coordinates{x, y})
 		}
 	}
 
-	return coveredPositions
+	return coveredCoordinates
 }
 
 func (v Vent) IsHorizontal() bool {
