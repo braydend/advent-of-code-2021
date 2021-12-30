@@ -57,3 +57,58 @@ func TestVent_IsHorizontal(t *testing.T) {
 		})
 	}
 }
+
+func TestFindOverlappingVents(t *testing.T) {
+	inputVents := []Vent{
+		NewVent(0, 9, 5, 9),
+		NewVent(8, 0, 0, 8),
+		NewVent(9, 4, 3, 4),
+		NewVent(2, 2, 2, 1),
+		NewVent(7, 0, 7, 4),
+		NewVent(6, 4, 2, 0),
+		NewVent(0, 9, 2, 9),
+		NewVent(3, 4, 1, 4),
+		NewVent(0, 0, 8, 8),
+		NewVent(5, 5, 8, 2),
+	}
+	expectedOutput := map[coordinates]int{
+		coordinates{7, 0}: 1,
+		coordinates{2, 1}: 1,
+		coordinates{7, 1}: 1,
+		coordinates{2, 2}: 1,
+		coordinates{7, 2}: 1,
+		coordinates{7, 3}: 1,
+		coordinates{1, 4}: 1,
+		coordinates{2, 4}: 1,
+		coordinates{3, 4}: 2,
+		coordinates{4, 4}: 1,
+		coordinates{5, 4}: 1,
+		coordinates{6, 4}: 1,
+		coordinates{7, 4}: 2,
+		coordinates{8, 4}: 1,
+		coordinates{9, 4}: 1,
+		coordinates{0, 9}: 2,
+		coordinates{1, 9}: 2,
+		coordinates{2, 9}: 2,
+		coordinates{3, 9}: 1,
+		coordinates{4, 9}: 1,
+		coordinates{5, 9}: 1,
+	}
+	type args struct {
+		vents []Vent
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantVentLocations map[coordinates]int
+	}{
+		{"correctly finds overlapping vents", args{inputVents}, expectedOutput},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotVentLocations := FindOverlappingVents(tt.args.vents); !reflect.DeepEqual(gotVentLocations, tt.wantVentLocations) {
+				t.Errorf("FindOverlappingVents() = %v, want %v", gotVentLocations, tt.wantVentLocations)
+			}
+		})
+	}
+}

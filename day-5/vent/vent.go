@@ -59,6 +59,29 @@ func (v Vent) GetCoveredCoordinates() (coveredCoordinates []coordinates) {
 	return coveredCoordinates
 }
 
+func FindOverlappingVents(vents []Vent) (ventLocations map[coordinates]int) {
+	ventLocations = make(map[coordinates]int)
+	for _, vent := range vents {
+		if !vent.IsHorizontal() {
+			continue
+		}
+		coveredCoordinates := vent.GetCoveredCoordinates()
+
+		for _, coordinate := range coveredCoordinates {
+			count, exists := ventLocations[coordinate]
+
+			if exists {
+				ventLocations[coordinate] = count + 1
+				continue
+			}
+
+			ventLocations[coordinate] = 1
+		}
+	}
+
+	return ventLocations
+}
+
 func (v Vent) IsHorizontal() bool {
 	return v.startingPosition.x == v.endingPosition.x || v.startingPosition.y == v.endingPosition.y
 }
