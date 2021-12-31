@@ -1,5 +1,7 @@
 package vent
 
+import "fmt"
+
 type Vent struct {
 	StartingPosition Coordinates
 	EndingPosition   Coordinates
@@ -94,4 +96,33 @@ func CountOverlappingVents(ventLocations map[Coordinates]int, threshold int) (ov
 	}
 
 	return overlapCount
+}
+
+func FindHighestXAndYFromCoordinates(ventCoordinates map[Coordinates]int) (highest Coordinates) {
+	for coordinates, _ := range ventCoordinates {
+		if coordinates.X > highest.X {
+			highest.X = coordinates.X
+		}
+
+		if coordinates.Y > highest.Y {
+			highest.Y = coordinates.Y
+		}
+	}
+
+	return highest
+}
+
+func BuildVentLocationMap(ventLocations map[Coordinates]int) (output string) {
+	highestCoordinates := FindHighestXAndYFromCoordinates(ventLocations)
+	for y := 0; y < highestCoordinates.Y; y++ {
+		fmt.Printf("%s\n", output)
+		for x := 0; x < highestCoordinates.X; x++ {
+			if value, exists := ventLocations[Coordinates{x, y}]; exists {
+				fmt.Printf("%s%d", output, value)
+				continue
+			}
+			fmt.Printf("%s%s", output, ".")
+		}
+	}
+	return output
 }
