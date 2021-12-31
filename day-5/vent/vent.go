@@ -1,68 +1,68 @@
 package vent
 
 type Vent struct {
-	startingPosition coordinates
-	endingPosition   coordinates
+	StartingPosition Coordinates
+	EndingPosition   Coordinates
 }
 
-type coordinates struct {
-	x int
-	y int
+type Coordinates struct {
+	X int
+	Y int
 }
 
 func NewVent(x1, y1, x2, y2 int) Vent {
-	return Vent{coordinates{x1, y1}, coordinates{x2, y2}}
+	return Vent{Coordinates{x1, y1}, Coordinates{x2, y2}}
 }
 
-func (v Vent) findHighestXAndY() (highest coordinates) {
-	if v.startingPosition.x >= v.endingPosition.x {
-		highest.x = v.startingPosition.x
+func (v Vent) findHighestXAndY() (highest Coordinates) {
+	if v.StartingPosition.X >= v.EndingPosition.X {
+		highest.X = v.StartingPosition.X
 	} else {
-		highest.x = v.endingPosition.x
+		highest.X = v.EndingPosition.X
 	}
 
-	if v.startingPosition.y >= v.endingPosition.y {
-		highest.y = v.startingPosition.y
+	if v.StartingPosition.Y >= v.EndingPosition.Y {
+		highest.Y = v.StartingPosition.Y
 	} else {
-		highest.y = v.endingPosition.y
+		highest.Y = v.EndingPosition.Y
 	}
 
 	return highest
 }
 
-func (v Vent) findLowestXAndY() (lowest coordinates) {
-	if v.startingPosition.x >= v.endingPosition.x {
-		lowest.x = v.endingPosition.x
+func (v Vent) findLowestXAndY() (lowest Coordinates) {
+	if v.StartingPosition.X >= v.EndingPosition.X {
+		lowest.X = v.EndingPosition.X
 	} else {
-		lowest.x = v.startingPosition.x
+		lowest.X = v.StartingPosition.X
 	}
 
-	if v.startingPosition.y >= v.endingPosition.y {
-		lowest.y = v.endingPosition.y
+	if v.StartingPosition.Y >= v.EndingPosition.Y {
+		lowest.Y = v.EndingPosition.Y
 	} else {
-		lowest.y = v.startingPosition.y
+		lowest.Y = v.StartingPosition.Y
 	}
 
 	return lowest
 }
 
-func (v Vent) GetCoveredCoordinates() (coveredCoordinates []coordinates) {
+func (v Vent) GetCoveredCoordinates() (coveredCoordinates []Coordinates) {
 	highest := v.findHighestXAndY()
 	lowest := v.findLowestXAndY()
 
-	for x := lowest.x; x <= highest.x; x++ {
-		for y := lowest.y; y <= highest.y; y++ {
-			coveredCoordinates = append(coveredCoordinates, coordinates{x, y})
+	for x := lowest.X; x <= highest.X; x++ {
+		for y := lowest.Y; y <= highest.Y; y++ {
+			coveredCoordinates = append(coveredCoordinates, Coordinates{x, y})
 		}
 	}
 
 	return coveredCoordinates
 }
 
-func FindOverlappingVents(vents []Vent) (ventLocations map[coordinates]int) {
-	ventLocations = make(map[coordinates]int)
+func FindOverlappingVents(vents []Vent, onlyHorizontal bool) (ventLocations map[Coordinates]int) {
+	ventLocations = make(map[Coordinates]int)
 	for _, vent := range vents {
-		if !vent.IsHorizontal() {
+		if onlyHorizontal && !vent.IsHorizontal() {
 			continue
 		}
 		coveredCoordinates := vent.GetCoveredCoordinates()
@@ -83,5 +83,15 @@ func FindOverlappingVents(vents []Vent) (ventLocations map[coordinates]int) {
 }
 
 func (v Vent) IsHorizontal() bool {
-	return v.startingPosition.x == v.endingPosition.x || v.startingPosition.y == v.endingPosition.y
+	return v.StartingPosition.X == v.EndingPosition.X || v.StartingPosition.Y == v.EndingPosition.Y
+}
+
+func CountOverlappingVents(ventLocations map[Coordinates]int, threshold int) (overlapCount int) {
+	for _, count := range ventLocations {
+		if count >= threshold {
+			overlapCount++
+		}
+	}
+
+	return overlapCount
 }
